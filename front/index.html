@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookHub | Online Book Management</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--light-color);
+        }
+
+        .logo span {
+            color: var(--primary-color);
+        }
+
+        /* Navigation Styles */
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: var(--light-color);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover {
+            background-color: var(--primary-color);
+        }
+
+        nav ul li a.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .menu-toggle span {
+            height: 3px;
+            width: 25px;
+            background-color: white;
+            margin: 3px 0;
+            transition: var(--transition);
+        }
+
+        /* Main Content Styles */
+        main {
+            min-height: calc(100vh - 140px);
+            padding: 2rem 0;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Section Headings */
+        .section-heading {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--secondary-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-heading:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+
+        .page-description {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* Book Cards */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Enhanced Book Covers */
+        .book-cover {
+            height: 220px;
+            background: linear-gradient(135deg, var(--light-color), #ddd);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+        }
+
+        .book-cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .book-cover-placeholder {
+            color: var(--dark-color);
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #3498db, #2c3e50);
+            color: white;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .book-card:hover .book-cover-image {
+            transform: scale(1.08);
+        }
+
+        .book-info {
+            padding: 1.5rem;
+        }
+
+        .book-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+
+        .book-author {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .book-category {
+            display: inline-block;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .availability {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .available {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        /* Form Styles */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-bar input {
+            flex: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .search-bar button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--light-color);
+            border-radius: 8px;
+        }
+
+        .feature i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Users Management Page Enhanced Styles */
+        .users-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .users-stats .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .users-stats .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .users-stats .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .users-list-section {
+            margin-top: 2rem;
+        }
+
+        .subsection-heading {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .users-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 2;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            min-width: 250px;
+        }
+
+        .filter-select {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        /* User Card Enhanced Design */
+        .user-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .user-name {
+            color: var(--secondary-color);
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .user-id {
+            background: var(--light-color);
+            color: var(--dark-color);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .user-details {
+            display: grid;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .user-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .user-detail strong {
+            color: #333;
+            min-width: 80px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: space-between;
+        }
+
+        .btn-view-profile {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex: 2;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-view-profile:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete-user {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            flex: 1;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-delete-user:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .no-users {
+            text-align: center;
+            color: #666;
+            font-size: 1.1rem;
+            padding: 3rem;
+            background: var(--light-color);
+            border-radius: 8px;
+            grid-column: 1 / -1;
+        }
+
+        /* Delete Button Styles */
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Profile Page Styles */
+        .profile-container {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .user-info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .reading-history {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            align-items: end;
+        }
+
+        .history-controls select {
+            flex: 1;
+        }
+
+        .history-item {
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--light-color);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .history-item h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--secondary-color);
+        }
+
+        .rating {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        /* Form improvements */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                margin-top: 1rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 0.5rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .form-container, .about-content {
+                padding: 1.5rem;
+            }
+
+            .menu-toggle {
+                display: flex;
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            nav ul {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                margin-top: 1rem;
+            }
+
+            nav ul.show {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .users-controls {
+                flex-direction: column;
+            }
+            
+            .search-input, .filter-select {
+                min-width: 100%;
+            }
+            
+            .user-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .user-actions {
+                flex-direction: column;
+            }
+            
+            .history-controls {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .users-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .users-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">Book<span>Hub</span></div>
+            <div class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav>
+                <ul id="navMenu">
+                    <li><a href="#" class="nav-link active" data-page="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-page="books">Books</a></li>
+                    <li><a href="#" class="nav-link" data-page="add-book">Add Book</a></li>
+                    <li><a href="#" class="nav-link" data-page="search">Search</a></li>
+                    <li><a href="#" class="nav-link" data-page="users">Register</a></li>
+                    <li><a href="#" class="nav-link" data-page="users-management">Users</a></li>
+                    <li><a href="#" class="nav-link" data-page="profile">Profile</a></li>
+                    <li><a href="#" class="nav-link" data-page="about">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <h1>Welcome to BookHub</h1>
+                <p>Your personal online library for managing and organizing your book collection with ease.</p>
+            </div>
+            
+            <h2 class="section-heading">Featured Books</h2>
+            <div class="books-grid" id="featuredBooks">
+                <!-- Featured books will be loaded here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Books Page -->
+        <section id="books" class="page">
+            <h2 class="section-heading">All Books</h2>
+            <div class="books-grid" id="allBooks">
+                <!-- All books will be loaded here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Add Book Page -->
+        <section id="add-book" class="page">
+            <h2 class="section-heading">Add New Book</h2>
+            <div class="form-container">
+                <form id="addBookForm">
+                    <div class="form-group">
+                        <label for="title">Book Title *</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Author *</label>
+                        <input type="text" id="author" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="Fiction">Fiction</option>
+                            <option value="Non-Fiction">Non-Fiction</option>
+                            <option value="Science">Science</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Biography">Biography</option>
+                            <option value="History">History</option>
+                            <option value="Fantasy">Fantasy</option>
+                            <option value="Mystery">Mystery</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Self-Help">Self-Help</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="availability">Availability</label>
+                        <select id="availability" required>
+                            <option value="available">Available</option>
+                            <option value="unavailable">Unavailable</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-block">Add Book</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Search Page -->
+        <section id="search" class="page">
+            <h2 class="section-heading">Search Books</h2>
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search by title or author...">
+                    <button class="btn" id="searchBtn">Search</button>
+                </div>
+            </div>
+            <div class="books-grid" id="searchResults">
+                <!-- Search results will be displayed here -->
+            </div>
+        </section>
+
+        <!-- User Registration Page -->
+        <section id="users" class="page">
+            <h2 class="section-heading">User Registration</h2>
+            <div class="form-container">
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="userName">Full Name *</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userEmail">Email *</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="userPhone">Phone</label>
+                        <input type="tel" id="userPhone">
+                    </div>
+                    <div class="form-group">
+                        <label for="userDob">Date of Birth</label>
+                        <input type="date" id="userDob">
+                    </div>
+                    <div class="form-group">
+                        <label for="userAddress">Address</label>
+                        <textarea id="userAddress" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="userGender">Gender</label>
+                        <select id="userGender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-block">Register User</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Users Management Page -->
+        <section id="users-management" class="page">
+            <h2 class="section-heading">Registered Users Management</h2>
+            <p class="page-description">View and manage all users registered in our book management system</p>
+            
+            <!-- User Statistics -->
+            <div class="users-stats">
+                <div class="stat-card">
+                    <span class="stat-number" id="totalUsers">0</span>
+                    <span class="stat-label">Total Users</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="maleUsers">0</span>
+                    <span class="stat-label">Male Users</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="femaleUsers">0</span>
+                    <span class="stat-label">Female Users</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="otherUsers">0</span>
+                    <span class="stat-label">Other</span>
+                </div>
+            </div>
+
+            <!-- Users List Section -->
+            <div class="users-list-section">
+                <h3 class="subsection-heading">All Registered Users</h3>
+                
+                <!-- Search and Filter -->
+                <div class="users-controls">
+                    <input type="text" id="searchUsers" placeholder="Search users by name or email..." class="search-input">
+                    <select id="filterGender" class="filter-select">
+                        <option value="">All Genders</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Users Grid -->
+                <div class="users-grid" id="usersList">
+                    <!-- Users will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- User Profile Page -->
+        <section id="profile" class="page">
+            <h2 class="section-heading">My Reading Profile</h2>
+            
+            <div class="profile-container">
+                <div class="user-info-card">
+                    <h3>Personal Information</h3>
+                    <div id="userProfileInfo">
+                        <p>Select a user to view their profile</p>
+                    </div>
+                </div>
+                
+                <div class="reading-stats">
+                    <h3>Reading Statistics</h3>
+                    <div class="stats-grid" id="readingStats">
+                        <!-- Stats will be loaded here -->
+                    </div>
+                </div>
+                
+                <div class="reading-history">
+                    <h3>Reading History</h3>
+                    <div class="history-controls">
+                        <select id="userSelector">
+                            <option value="">Select a user to view reading history</option>
+                        </select>
+                        <button class="btn" onclick="loadReadingHistory()">Load History</button>
+                    </div>
+                    <div id="readingHistoryList">
+                        <!-- Reading history will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Page -->
+        <section id="about" class="page">
+            <h2 class="section-heading">About BookHub</h2>
+            <div class="about-content">
+                <p>BookHub is a simple, user-friendly online book management system designed to help you organize and manage your personal book collection.</p>
+                <p>With BookHub, you can easily add new books to your collection, search for specific titles or authors, and keep track of which books are currently available.</p>
+                
+                <div class="features">
+                    <div class="feature">
+                        <i>📚</i>
+                        <h3>Book Collection</h3>
+                        <p>Manage all your books in one place with detailed information.</p>
+                    </div>
+                    <div class="feature">
+                        <i>🔍</i>
+                        <h3>Easy Search</h3>
+                        <p>Quickly find books by title or author with our search feature.</p>
+                    </div>
+                    <div class="feature">
+                        <i>➕</i>
+                        <h3>Add Books</h3>
+                        <p>Easily add new books to your collection with our simple form.</p>
+                    </div>
+                    <div class="feature">
+                        <i>👥</i>
+                        <h3>User Management</h3>
+                        <p>Register users and track their reading history.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 BookHub - Online Book Management System. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // API Base URL
+        const API_BASE_URL = 'http://localhost:3000';
+
+        // DOM Elements
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        const featuredBooksContainer = document.getElementById('featuredBooks');
+        const allBooksContainer = document.getElementById('allBooks');
+        const searchResultsContainer = document.getElementById('searchResults');
+        const addBookForm = document.getElementById('addBookForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const userForm = document.getElementById('userForm');
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📖 BookHub Frontend Loaded');
+            // Load books on page load
+            loadBooks();
+            
+            // Set up event listeners
+            setupEventListeners();
+        });
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Navigation
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('data-page');
+                    switchPage(pageId);
+                    
+                    // Update active nav link
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close mobile menu if open
+                    if (navMenu.classList.contains('show')) {
+                        navMenu.classList.remove('show');
+                    }
+                });
+            });
+            
+            // Mobile menu toggle
+            menuToggle.addEventListener('click', function() {
+                navMenu.classList.toggle('show');
+            });
+            
+            // Add book form submission
+            addBookForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addNewBook();
+            });
+            
+            // User registration form submission
+            userForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                registerUser();
+            });
+            
+            // Search functionality
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+        }
+
+        // Switch between pages
+        function switchPage(pageId) {
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            // Refresh data when switching to specific pages
+            if (pageId === 'books') {
+                loadBooks();
+            } else if (pageId === 'users-management') {
+                loadUsersManagement();
+            } else if (pageId === 'users') {
+                loadUsers();
+            }
+        }
+
+        // Load books from API
+        async function loadBooks() {
+            try {
+                console.log('📡 Loading books from backend...');
+                const response = await fetch(`${API_BASE_URL}/books`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch books');
+                }
+                
+                const books = await response.json();
+                console.log('✅ Books loaded:', books.length);
+                
+                displayFeaturedBooks(books);
+                displayAllBooks(books);
+            } catch (error) {
+                console.error('❌ Error loading books:', error);
+                showError('Failed to load books. Please make sure the backend server is running.');
+                
+                // Show empty state
+                featuredBooksContainer.innerHTML = '<p>Unable to load books. Please check if server is running.</p>';
+                allBooksContainer.innerHTML = '<p>Unable to load books. Please check if server is running.</p>';
+            }
+        }
+
+        // Display featured books on the home page
+        function displayFeaturedBooks(books) {
+            featuredBooksContainer.innerHTML = '';
+            
+            // Show only available books as featured
+            const availableBooks = books.filter(book => book.availability === 'available');
+            
+            // Limit to 4 featured books
+            const featuredBooks = availableBooks.slice(0, 4);
+            
+            if (featuredBooks.length === 0) {
+                featuredBooksContainer.innerHTML = '<p>No featured books available.</p>';
+                return;
+            }
+            
+            featuredBooks.forEach(book => {
+                const bookCard = createBookCard(book, false);
+                featuredBooksContainer.appendChild(bookCard);
+            });
+        }
+
+        // Display all books on the books page
+        function displayAllBooks(books) {
+            allBooksContainer.innerHTML = '';
+            
+            if (books.length === 0) {
+                allBooksContainer.innerHTML = '<p>No books found in the library.</p>';
+                return;
+            }
+            
+            books.forEach(book => {
+                const bookCard = createBookCard(book, true);
+                allBooksContainer.appendChild(bookCard);
+            });
+        }
+
+        // Create a book card element
+        function createBookCard(book, showDeleteButton = false) {
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.setAttribute('data-book-id', book.id);
+            
+            let deleteButton = '';
+            if (showDeleteButton) {
+                deleteButton = `
+                    <button class="btn-delete" onclick="deleteBook(${book.id}, '${book.title.replace(/'/g, "\\'")}')">
+                        🗑️ Delete
+                    </button>
+                `;
+            }
+            
+            // Use actual cover if available, otherwise use placeholder
+            const coverContent = book.cover_url 
+                ? `<img src="${book.cover_url}" alt="${book.title}" class="book-cover-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`
+                : '';
+            
+            const placeholder = `<div class="book-cover-placeholder">${book.title}</div>`;
+            
+            card.innerHTML = `
+                <div class="book-cover">
+                    ${coverContent}
+                    ${book.cover_url ? placeholder : placeholder}
+                </div>
+                <div class="book-info">
+                    <h3 class="book-title">${book.title}</h3>
+                    <p class="book-author">by ${book.author}</p>
+                    <span class="book-category">${book.category}</span>
+                    <div class="availability">
+                        <span class="${book.availability === 'available' ? 'available' : 'unavailable'}">
+                            ${book.availability === 'available' ? 'Available' : 'Checked Out'}
+                        </span>
+                    </div>
+                    ${deleteButton}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Add a new book to the collection via API
+        async function addNewBook() {
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+            const availability = document.getElementById('availability').value;
+            
+            try {
+                console.log('📝 Adding new book...');
+                const response = await fetch(`${API_BASE_URL}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        title,
+                        author,
+                        category,
+                        description,
+                        availability
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to add book');
+                }
+                
+                const newBook = await response.json();
+                console.log('✅ Book added:', newBook);
+                
+                // Reset form
+                addBookForm.reset();
+                
+                // Show success message
+                showSuccess('Book added successfully!');
+                
+                // Reload books to include the new one
+                loadBooks();
+                
+                // Switch to books page to see the new addition
+                switchPage('books');
+                navLinks.forEach(link => link.classList.remove('active'));
+                document.querySelector('[data-page="books"]').classList.add('active');
+                
+            } catch (error) {
+                console.error('❌ Error adding book:', error);
+                showError('Failed to add book. Please try again.');
+            }
+        }
+
+        // Delete a book from the collection
+        async function deleteBook(bookId, bookTitle) {
+            // Confirm before deleting
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) {
+                return;
+            }
+            
+            try {
+                console.log('🗑️ Deleting book...', bookId);
+                const response = await fetch(`${API_BASE_URL}/books/${bookId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to delete book');
+                }
+                
+                const result = await response.json();
+                console.log('✅ Book deleted:', result);
+                
+                // Show success message
+                showSuccess(`"${bookTitle}" deleted successfully!`);
+                
+                // Reload books to reflect the deletion
+                loadBooks();
+                
+            } catch (error) {
+                console.error('❌ Error deleting book:', error);
+                showError('Failed to delete book. Please try again.');
+            }
+        }
+
+        // Search books by title or author via API
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            
+            if (query === '') {
+                searchResultsContainer.innerHTML = '<p>Please enter a search term.</p>';
+                return;
+            }
+            
+            try {
+                console.log('🔍 Searching books...');
+                const response = await fetch(`${API_BASE_URL}/books/search?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to search books');
+                }
+                
+                const results = await response.json();
+                console.log('✅ Search results:', results.length);
+                
+                searchResultsContainer.innerHTML = '';
+                
+                if (results.length === 0) {
+                    searchResultsContainer.innerHTML = '<p>No books found matching your search.</p>';
+                    return;
+                }
+                
+                results.forEach(book => {
+                    const bookCard = createBookCard(book, true);
+                    searchResultsContainer.appendChild(bookCard);
+                });
+            } catch (error) {
+                console.error('❌ Error searching books:', error);
+                showError('Failed to search books. Please try again.');
+            }
+        }
+
+        // User Management Functions
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const users = await response.json();
+                populateUserSelector(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // Load users for management page
+        async function loadUsersManagement() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`);
+                const users = await response.json();
+                displayUsersManagement(users);
+                updateUserStats(users);
+                setupUserFilters(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Failed to load users');
+            }
+        }
+
+        // Display users in management page with full details
+        function displayUsersManagement(users) {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="no-users">No users registered yet. Be the first to register!</div>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map(user => `
+                <div class="user-card" data-user-id="${user.id}" data-gender="${user.gender || ''}">
+                    <div class="user-header">
+                        <h3 class="user-name">${user.name}</h3>
+                        <span class="user-id">ID: ${user.id}</span>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="user-detail">
+                            <strong>Email:</strong>
+                            <span>📧 ${user.email}</span>
+                        </div>
+                        ${user.phone ? `
+                        <div class="user-detail">
+                            <strong>Phone:</strong>
+                            <span>📞 ${user.phone}</span>
+                        </div>
+                        ` : ''}
+                        ${user.dob ? `
+                        <div class="user-detail">
+                            <strong>Birth Date:</strong>
+                            <span>🎂 ${new Date(user.dob).toLocaleDateString('en-IN')}</span>
+                        </div>
+                        ` : ''}
+                        ${user.gender ? `
+                        <div class="user-detail">
+                            <strong>Gender:</strong>
+                            <span>👤 ${user.gender}</span>
+                        </div>
+                        ` : ''}
+                        ${user.address ? `
+                        <div class="user-detail">
+                            <strong>Address:</strong>
+                            <span>🏠 ${user.address}</span>
+                        </div>
+                        ` : ''}
+                        <div class="user-detail">
+                            <strong>Joined:</strong>
+                            <span>📅 ${new Date(user.created_at).toLocaleDateString('en-IN')}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="user-actions">
+                        <button class="btn-view-profile" onclick="viewUserProfile(${user.id})">
+                            📚 View Reading History
+                        </button>
+                        <button class="btn-delete-user" onclick="deleteUser(${user.id}, '${user.name.replace(/'/g, "\\'")}')">
+                            🗑️ Delete User
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update user statistics
+        function updateUserStats(users) {
+            const totalUsers = users.length;
+            const maleUsers = users.filter(user => user.gender === 'Male').length;
+            const femaleUsers = users.filter(user => user.gender === 'Female').length;
+            const otherUsers = users.filter(user => user.gender && !['Male', 'Female'].includes(user.gender)).length;
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('maleUsers').textContent = maleUsers;
+            document.getElementById('femaleUsers').textContent = femaleUsers;
+            document.getElementById('otherUsers').textContent = otherUsers;
+        }
+
+        // Setup search and filter functionality
+        function setupUserFilters(users) {
+            const searchInput = document.getElementById('searchUsers');
+            const genderFilter = document.getElementById('filterGender');
+            
+            searchInput.addEventListener('input', function() {
+                filterUsers(users);
+            });
+            
+            genderFilter.addEventListener('change', function() {
+                filterUsers(users);
+            });
+        }
+
+        // Filter users based on search and gender
+        function filterUsers(allUsers) {
+            const searchTerm = document.getElementById('searchUsers').value.toLowerCase();
+            const genderFilter = document.getElementById('filterGender').value;
+            
+            const filteredUsers = allUsers.filter(user => {
+                const matchesSearch = user.name.toLowerCase().includes(searchTerm) || 
+                                     user.email.toLowerCase().includes(searchTerm);
+                const matchesGender = !genderFilter || user.gender === genderFilter;
+                
+                return matchesSearch && matchesGender;
+            });
+            
+            displayUsersManagement(filteredUsers);
+        }
+
+        // Delete user function
+        async function deleteUser(userId, userName) {
+            if (!confirm(`Are you sure you want to delete user "${userName}"?\n\n⚠️ This will permanently delete:\n• User account\n• All their reading history\n• All their ratings and notes\n\nThis action cannot be undone!`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showSuccess(`✅ User "${userName}" deleted successfully!`);
+                    loadUsersManagement(); // Refresh the list
+                } else {
+                    throw new Error(result.error || 'Failed to delete user');
+                }
+                
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showError('❌ Failed to delete user. Please try again.');
+            }
+        }
+
+        function populateUserSelector(users) {
+            const selector = document.getElementById('userSelector');
+            selector.innerHTML = '<option value="">Select a user to view reading history</option>';
+            
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} (${user.email})`;
+                selector.appendChild(option);
+            });
+        }
+
+        // User Registration
+        async function registerUser() {
+            const userData = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                phone: document.getElementById('userPhone').value,
+                dob: document.getElementById('userDob').value,
+                address: document.getElementById('userAddress').value,
+                gender: document.getElementById('userGender').value
+            };
+            
+            console.log('🔄 Sending user data:', userData);
+            
+            // Show loading state
+            const submitBtn = document.querySelector('#userForm button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Registering...';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.json();
+                console.log('📨 Server response:', result);
+                
+                if (response.ok && result.success) {
+                    showSuccess('User registered successfully!');
+                    document.getElementById('userForm').reset();
+                    loadUsersManagement(); // Refresh users list
+                } else {
+                    showError(result.error || 'Failed to register user');
+                }
+                
+            } catch (error) {
+                console.error('❌ Network error:', error);
+                showError('Network error: Could not connect to server. Make sure backend is running.');
+            } finally {
+                // Restore button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Reading History Functions
+        async function loadReadingHistory() {
+            const userId = document.getElementById('userSelector').value;
+            if (!userId) {
+                showError('Please select a user first');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/${userId}/reading-history`);
+                const history = await response.json();
+                displayReadingHistory(history);
+                updateUserStatsForProfile(userId, history);
+            } catch (error) {
+                console.error('Error loading reading history:', error);
+                showError('Failed to load reading history');
+            }
+        }
+
+        function displayReadingHistory(history) {
+            const historyList = document.getElementById('readingHistoryList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No reading history found for this user.</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <h4>${item.title}</h4>
+                    <p><strong>Author:</strong> ${item.author}</p>
+                    <p><strong>Category:</strong> ${item.category}</p>
+                    <p><strong>Date Read:</strong> ${new Date(item.date_read).toLocaleDateString()}</p>
+                    ${item.rating ? `<p><strong>Rating:</strong> <span class="rating">${'⭐'.repeat(item.rating)}</span></p>` : ''}
+                    ${item.notes ? `<p><strong>Notes:</strong> ${item.notes}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function updateUserStatsForProfile(userId, history) {
+            const statsGrid = document.getElementById('readingStats');
+            const totalBooks = history.length;
+            const averageRating = history.length > 0 
+                ? (history.reduce((sum, item) => sum + (item.rating || 0), 0) / history.length).toFixed(1)
+                : 0;
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <span class="stat-number">${totalBooks}</span>
+                    <span class="stat-label">Total Books Read</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${averageRating}</span>
+                    <span class="stat-label">Average Rating</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">${new Set(history.map(item => item.category)).size}</span>
+                    <span class="stat-label">Different Categories</span>
+                </div>
+            `;
+        }
+
+        function viewUserProfile(userId) {
+            // Switch to profile page and load data for this user
+            switchPage('profile');
+            navLinks.forEach(link => link.classList.remove('active'));
+            document.querySelector('[data-page="profile"]').classList.add('active');
+            
+            // Set the user selector to this user
+            document.getElementById('userSelector').value = userId;
+            loadReadingHistory();
+        }
+
+        // Utility functions for showing messages
+        function showSuccess(message) {
+            alert('✅ ' + message);
+        }
+
+        function showError(message) {
+            alert('❌ ' + message);
+        }
+    </script>
+</body>
+</html>
