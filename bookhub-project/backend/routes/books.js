@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 
-// Function to fetch book cover from Open Library API
 async function fetchBookCover(title, author) {
     try {
         const searchQuery = `${title} ${author}`.toLowerCase().replace(/\s+/g, '+');
@@ -18,7 +17,6 @@ async function fetchBookCover(title, author) {
     return null;
 }
 
-// GET /books - Get all books
 router.get('/', async (req, res) => {
     try {
         const [results] = await pool.execute('SELECT * FROM books ORDER BY id DESC');
@@ -29,7 +27,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST /books - Add a new book
 router.post('/', async (req, res) => {
     try {
         const { title, author, category, description, availability } = req.body;
@@ -38,7 +35,6 @@ router.post('/', async (req, res) => {
             return res.status(400).json({ error: 'Title, author, and category are required' });
         }
         
-        // Fetch book cover automatically
         const cover_url = await fetchBookCover(title, author);
         
         const query = `
@@ -66,7 +62,6 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET /books/search - Search books by title or author
 router.get('/search', async (req, res) => {
     try {
         const query = req.query.query;
@@ -90,7 +85,6 @@ router.get('/search', async (req, res) => {
     }
 });
 
-// DELETE /books/:id - Delete a book by ID
 router.delete('/:id', async (req, res) => {
     try {
         const bookId = req.params.id;

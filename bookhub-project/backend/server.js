@@ -5,16 +5,16 @@ const bodyParser = require('body-parser');
 const app = express();
 const PORT = 3000;
 
-// ✅ MIDDLEWARE FIRST - This is crucial!
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// ✅ THEN IMPORT ROUTES
+
 const bookRoutes = require('./routes/books');
 const userRoutes = require('./routes/users');
 
-// ✅ THEN USE ROUTES
+
 app.use('/books', bookRoutes);
 app.use('/users', userRoutes);
 
@@ -35,7 +35,7 @@ app.get('/', (req, res) => {
     });
 });
 
-// Health check route
+
 app.get('/health', (req, res) => {
     res.json({ 
         status: 'OK', 
@@ -44,7 +44,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Handle 404 - Route not found (FIXED VERSION)
+// 404 - Route not found 
 app.use((req, res) => {
     res.status(404).json({ 
         error: 'Route not found',
@@ -53,7 +53,6 @@ app.use((req, res) => {
     });
 });
 
-// Error handling middleware
 app.use((error, req, res, next) => {
     console.error('Server error:', error);
     res.status(500).json({ 
@@ -64,24 +63,11 @@ app.use((error, req, res, next) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log('='.repeat(50));
-    console.log('🚀 Server running on http://localhost:' + PORT);
-    console.log('📚 BookHub API is ready to use!');
-    console.log('⏰ Started at:', new Date().toLocaleString());
-    console.log('='.repeat(50));
-    console.log('💡 Available endpoints:');
-    console.log('   GET  /books');
-    console.log('   POST /books');
-    console.log('   DELETE /books/:id');
-    console.log('   GET  /books/search?query=...');
-    console.log('   GET  /users');
-    console.log('   POST /users');
-    console.log('   GET  /users/:id/reading-history');
-    console.log('='.repeat(50));
+ console.log('Server started successfully running on localhost:' + PORT);
+    
 });
-
-// Handle graceful shutdown
+// end server
 process.on('SIGINT', () => {
-    console.log('\n🛑 Shutting down server gracefully...');
+    console.log('\nShutting down server gracefully...');
     process.exit(0);
 });

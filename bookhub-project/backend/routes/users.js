@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../config/database');
 
-// GET /users - Get all users
+
 router.get('/', async (req, res) => {
     try {
         const [results] = await pool.execute('SELECT * FROM users ORDER BY id DESC');
@@ -13,19 +13,19 @@ router.get('/', async (req, res) => {
     }
 });
 
-// POST /users - Create a new user
+
 router.post('/', async (req, res) => {
     try {
-        console.log('📝 Received user data:', req.body);
+        console.log(' Received user data:', req.body);
         
         const { name, email, phone, dob, address, gender } = req.body;
         
-        // Basic validation
+       
         if (!name || !email) {
             return res.status(400).json({ error: 'Name and email are required' });
         }
         
-        // Simple insert query
+        
         const query = `INSERT INTO users (name, email, phone, dob, address, gender) VALUES (?, ?, ?, ?, ?, ?)`;
         const values = [name, email, phone, dob, address, gender];
         
@@ -34,9 +34,9 @@ router.post('/', async (req, res) => {
         
         const [result] = await pool.execute(query, values);
         
-        console.log('✅ User inserted successfully, ID:', result.insertId);
+        console.log('User inserted successfully, ID:', result.insertId);
         
-        // Return success
+      
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
@@ -52,7 +52,7 @@ router.post('/', async (req, res) => {
         });
         
     } catch (error) {
-        console.error('❌ DATABASE ERROR:', error);
+        console.error('DATABASE ERROR:', error);
         
         if (error.code === 'ER_DUP_ENTRY') {
             res.status(400).json({ 
@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// GET /users/:id/reading-history
+
 router.get('/:id/reading-history', async (req, res) => {
     try {
         const userId = req.params.id;
@@ -87,24 +87,23 @@ router.get('/:id/reading-history', async (req, res) => {
     }
 });
 
-// DELETE /users/:id - Delete a user by ID
+
 router.delete('/:id', async (req, res) => {
     try {
         const userId = req.params.id;
         
-        // Validate user ID
+     
         if (!userId || isNaN(userId)) {
             return res.status(400).json({ error: 'Valid user ID is required' });
         }
         
-        // Check if user exists
+   
         const [checkResult] = await pool.execute('SELECT * FROM users WHERE id = ?', [userId]);
         
         if (checkResult.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
         
-        // Delete the user (reading_history will be deleted automatically due to CASCADE)
         const [result] = await pool.execute('DELETE FROM users WHERE id = ?', [userId]);
         
         res.json({ 
